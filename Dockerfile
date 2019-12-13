@@ -11,20 +11,11 @@ RUN set -x \
 
 RUN ssh-keygen -A
 
-RUN adduser --disabled-password --gecos "Borg Backup" borg \
- # This "unlocks" the user borg so it may log through ssh, more here: https://arlimus.github.io/articles/usepam/
- && sed -i -e 's/^borg:!:/borg:\*:/' /etc/shadow
+ADD ./*.sh /
 
+RUN /add-user.sh borg
 
-USER borg
-
-RUN mkdir ~/.ssh && chmod 700 ~/.ssh
-
-USER root
-
-VOLUME /home/borg/Repository
-
-ADD ./entrypoint.sh /
+VOLUME /home
 
 EXPOSE 22
 

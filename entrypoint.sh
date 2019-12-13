@@ -9,14 +9,5 @@ if [ -n "${BORG_GID}" ]; then
     usermod -g ${BORG_GID} borg
 fi
 
-if [ -n "${GITHUB_USERNAME}" ]; then
-    wget https://github.com/${GITHUB_USERNAME}.keys -O /home/borg/.ssh/authorized_keys \
-    chown borg.borg /home/borg/.ssh/authorized_keys
-    chmod 600 /home/borg/.ssh/authorized_keys
-fi
-
-chown -R borg.borg /home/borg
-chown -R borg.borg /home/borg/.ssh
-
 exec /usr/sbin/sshd -D -e
 
