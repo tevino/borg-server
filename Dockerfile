@@ -1,6 +1,6 @@
 FROM alpine:latest
 
-RUN apk --no-cache add borgbackup openssh-server shadow \
+RUN apk --no-cache add borgbackup openssh-server shadow wget \
 && rm -rf /var/cache/apk/*
 
 RUN set -x \
