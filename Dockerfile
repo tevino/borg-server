@@ -13,8 +13,6 @@ RUN ssh-keygen -A
 
 ADD ./entrypoint.sh ./borg_users /usr/local/bin/
 
-RUN borg_users create borg
-
 VOLUME /home
 
 EXPOSE 22

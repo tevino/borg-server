@@ -31,9 +31,3 @@ COMMAND: create|delete|list
     ls|list: List existing users.
 ```
 
-### Environments
-
-#### BORG_UID and BORG_GID
-
-The user ID and group ID of the default user `borg` will be changed to the given value.
-
