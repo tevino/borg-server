@@ -1,0 +1,68 @@
+#!/bin/sh
+
+SCRIPT_NAME=$(basename $0)
+
+
+create() {
+    username=$1
+    github=${2:-tevino}
+
+    if [[ -z "$username" ]]; then
+        echo "Usage: $SCRIPT_NAME create USER [Github UID($github)]"
+        exit 1
+    fi
+
+    ### Add user
+    addgroup "$username"
+    adduser -G "$username" --disabled-password --gecos "Borg Backup User $username" "$username"
+    # This "unlocks" the user so it may log through ssh, more here: https://arlimus.github.io/articles/usepam/
+    sed -i -e "s/^${username}:!:/${username}:\*:/" /etc/shadow
+    mkdir /home/${username}/.ssh && chmod 700 /home/${username}/.ssh
+
+
+    ### Download github keys
+    wget https://github.com/${github}.keys -O /home/${username}/.ssh/authorized_keys
+    chown ${username}:${username} /home/${username}/.ssh/authorized_keys
+
+
+    ### Add restriction to keys
+    sed -i -e "s/^/command=\"borg serve --restrict-to-path \/home\/${username}\",restrict /g" /home/${username}/.ssh/authorized_keys
+    chmod 600 /home/${username}/.ssh/authorized_keys
+
+
+    ### Set owner
+    chown -R ${username}:${username} /home/${username}
+}
+
+delete() {
+    username=$1
+
+    if [[ -z "$username" ]]; then
+        echo "Usage: $SCRIPT_NAME delete USER"
+        exit 1
+    fi
+
+    ### Delete user and home directory
+    deluser --remove-home ${username}
+}
+
+list() {
+    ls -1 $@ /home
+}
+
+
+case "$1" in
+    create)  shift; create ${@};;
+    delete)  shift; delete ${@};;
+    ls|list) shift;   list ${@};;
+    *)
+        echo "Usage: $SCRIPT_NAME COMMAND"
+        echo ""
+        echo "COMMAND: create|delete|list"
+        echo ""
+        echo "   create: Create a new user."
+        echo "   delete: Delete a user and all its files."
+        echo "  ls|list: List existing users."
+        exit 1
+    ;;
+esac

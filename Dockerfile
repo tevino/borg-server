@@ -11,13 +11,13 @@ RUN set -x \
 
 RUN ssh-keygen -A
 
-ADD ./*.sh /
+ADD ./entrypoint.sh ./borg_users /usr/local/bin/
 
-RUN /add-user.sh borg
+RUN borg_users create borg
 
 VOLUME /home
 
 EXPOSE 22
 
-CMD ["/entrypoint.sh"]
+CMD ["/usr/local/bin/entrypoint.sh"]
 
